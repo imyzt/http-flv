@@ -1,9 +1,15 @@
 FROM alpine:3.8
 
+MAINTAINER 'fork from https://github.com/mugennsou/http-flv && edit'
+
+ENV MIRROR_URL http://mirrors.ustc.edu.cn/alpine/
 ENV NGINX_VERSION 1.15.6
 ENV NGINX_HTTP_FLV_MODULE_VERSION 1.2.5
 
 RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
+  && echo '' > /etc/apk/repositories \
+  && echo "${MIRROR_URL}v3.3//main"     >> /etc/apk/repositories \
+  && echo "${MIRROR_URL}v3.3//community" >> /etc/apk/repositories \
   && CONFIG="\
   --prefix=/etc/nginx \
   --sbin-path=/usr/sbin/nginx \
@@ -126,10 +132,11 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
   && ln -sf /dev/stderr /var/log/nginx/error.log
 
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY mime.types /etc/nginx/mime.types
 COPY conf.d/ /etc/nginx/conf.d/
 COPY www/ /var/www/
 
-EXPOSE 80 1935
+EXPOSE 8089 1985
 
 STOPSIGNAL SIGTERM
 
